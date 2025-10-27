@@ -2,6 +2,9 @@ import type { Route } from "./+types/home";
 import Navbar from "~/components/Navbar";
 import {resumes} from "../../constants";
 import ResumeCard from "~/components/ResumeCard";
+import {usePuterStore } from "~/lib/puter";
+import { useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -11,16 +14,24 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { isLoading, auth } = usePuterStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect to auth page if user is not authenticated or if authentication is still loading
+    if (isLoading || !auth.isAuthenticated) {
+      navigate('/auth?next=/');
+    }
+  }, [isLoading, auth.isAuthenticated, navigate]);
+
   return <main className="bg-[url('/images/bg-main.svg')] bg-cover">
       <Navbar />
 
       <section className="main-section">
             <div className="page-heading py-16 ">
                 <h1>Track Your Application and Resume Ratings</h1>
-                    <h2>Review your submissions and check AI-powered feedback</h2>
-
+                <h2>Review your submissions and check AI-powered feedback</h2>
             </div>
-
 
       {resumes.length > 0 && (
           <div className="resumes-section">
